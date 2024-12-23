@@ -1,13 +1,14 @@
 import { Sequelize } from 'sequelize'
+import { __CONFIG__ } from '.';
 
 const sequelize = new Sequelize({
     dialect: 'mysql',
-    host: 'mysql-265b5589-mullayam06.f.aivencloud.com',
-    port: 20347,
-    username: 'avnadmin',
-    password: 'AVNS_Oli9iTS1DHVuUra6KSP',
+    host:__CONFIG__.DATABASE.DB_HOST, 
+    port: __CONFIG__.DATABASE.DB_PORT,
+    username: __CONFIG__.DATABASE.DB_USER,
+    password: __CONFIG__.DATABASE.DB_PASS,
     logging: false,
-    database: 'defaultdb',
+    database:  __CONFIG__.DATABASE.DB_NAME,
     dialectOptions: {
         ssl: {
             require: true,
