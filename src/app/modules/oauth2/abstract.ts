@@ -10,7 +10,7 @@ export abstract class AbstractOAuth2Provider implements IAuthProvider {
         this.clientSecret = clientSecret;
         this.redirectUri = redirectUri;
     }
-     
+
     abstract getAuthUrl(): string;
 
     abstract handleCallback<T>(code: string): Promise<T>;

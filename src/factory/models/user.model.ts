@@ -10,19 +10,19 @@ interface UserAttributes {
     email: string;
     password: string;
     role?: string;
-    avatar?: string;
+    avatar?: string ;
     is_email_verified?: boolean;
-    email_verification_token?: string;
-    email_verification_token_expiry?: Date;
-    email_verified_at?: Date;
-    password_reset_token?: string;
-    password_reset_token_expiry?: Date;
-    password_reset_at?: Date;
-    status?: USER_STATUS; 
+    email_verification_token?: string | null;
+    email_verification_token_expiry?: Date | null;
+    email_verified_at?: Date | null;
+    password_reset_token?: string | null;
+    password_reset_token_expiry?: Date | null;
+    password_reset_at?: Date | null;
+    status?: USER_STATUS;
     deleted_at?: Date;
 }
 
-interface UserCreationAttributes extends Optional<UserAttributes, 'id'> { }
+export interface UserCreationAttributes extends Optional<UserAttributes, 'id'> { }
 
 class UserModel extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
     id!: number;
@@ -30,18 +30,18 @@ class UserModel extends Model<UserAttributes, UserCreationAttributes> implements
     email!: string;
     password!: string;
     role?: string;
-    avatar?: string;
+    avatar?: string ;
     is_email_verified?: boolean;
-    email_verification_token?: string;
-    email_verification_token_expiry?: Date;
-    email_verified_at?: Date;
-    password_reset_token?: string;
-    password_reset_token_expiry?: Date;
-    password_reset_at?: Date;
+    email_verification_token?: string | null;
+    email_verification_token_expiry?: Date | null;
+    email_verified_at?: Date | null;
+    password_reset_token?: string | null;
+    password_reset_token_expiry?: Date | null;
+    password_reset_at?: Date | null;
     status?: USER_STATUS;
     readonly created_at?: Date;
     readonly updated_at?: Date;
-    readonly deleted_at?:Date;
+    readonly deleted_at?: Date;
 }
 
 UserModel.init(
@@ -78,28 +78,41 @@ UserModel.init(
             type: DataTypes.BOOLEAN,
             defaultValue: false
         },
-        email_verification_token: DataTypes.TEXT,
+        email_verification_token: {
+            type: DataTypes.DATE,
+            allowNull: true
+        },
         email_verification_token_expiry: {
             type: DataTypes.DATE,
             defaultValue: new Date(new Date().getTime() + 24 * 60 * 60 * 100)
         },
-        email_verified_at: DataTypes.DATE,
-        password_reset_token: DataTypes.TEXT,
+        email_verified_at: {
+            type: DataTypes.DATE,
+            allowNull: true
+        },
+        password_reset_token: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
         password_reset_token_expiry: {
             type: DataTypes.DATE,
-            defaultValue: new Date(new Date().getTime() + 24 * 60 * 60 * 100)
+            defaultValue: new Date(new Date().getTime() + 24 * 60 * 60 * 100),
+            allowNull: true
         },
-        password_reset_at: DataTypes.DATE,
+        password_reset_at: {
+            type: DataTypes.DATE,
+            allowNull: true
+        },
         status: {
             type: DataTypes.ENUM,
             values: Object.values(USER_STATUS),
-            defaultValue: USER_STATUS.PENDING
+            defaultValue: USER_STATUS.INACTIVE
         },
         deleted_at: {
             type: DataTypes.DATE,
             defaultValue: null
         },
-        
+
     },
     {
         sequelize,

@@ -51,8 +51,6 @@ declare global {
                 [key: string]: any;
             };
             io?: Server
-
-            files?: FileHandler[] | FileHandler;
             isAuthenticated?: boolean;
             user?: IUser;
             clientSecret?: string | null

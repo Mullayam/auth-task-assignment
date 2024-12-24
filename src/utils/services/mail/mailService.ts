@@ -43,7 +43,7 @@ export class MailService {
     private TransportOptions(): SMTPTransport.Options {
         return {
             host: __CONFIG__.SMTP_SETTINGS.SMTP_HOST as string,
-            port: Number(__CONFIG__.SMTP_SETTINGS.SMTP_HOST_PASS),
+            port: Number(__CONFIG__.SMTP_SETTINGS.SMTP_HOST_PORT),
             secure: false,
             auth: {
                 user: __CONFIG__.SMTP_SETTINGS.SMTP_HOST_USER,
@@ -141,7 +141,7 @@ export class MailService {
      */
     async SendTemplate({ to, subject, template, context, from }: Omit<MailOptionsWithTemplate, 'text' | 'html'>): Promise<SentMessageInfo> {
         if (!from) {
-            from = `${process.env.SENDER_NAME as string} <${process.env.MAIL_USER as string}>`
+            from = `${__CONFIG__.SMTP_SETTINGS.SMTP_SENDER_NAME as string} <${__CONFIG__.SMTP_SETTINGS.SMTP_SENDER_NAME as string}>`
         }
         const PrepareEmailOptions: Mail.Options & TemplateOptions = {
             from,

@@ -1,21 +1,20 @@
 import type { Request, Response } from "express";
-import { IUser } from "@/utils/interfaces/user.interface";
-import { basename } from "path";
 import UserModel from "@/factory/models/user.model";
+import { PublicRoute } from "@/utils/decorators";
 
 class MediaUploadController {
+    @PublicRoute()
     async uploadMedia(req: Request, res: Response) {
         try {
-            const user = req as IUser
+
             if (!req.file) {
                 throw new Error("File is required")
             }
-            const file = req.file as Express.Multer.File;
-
-            const fileName = basename(file.filename)
-              await UserModel.update({ avatar: fileName }, { where: { id: user.uid } })
-
-            res.json({ message: "File uploaded successfully", result: null, success: true })
+            const uid = req.body.user_id as string
+            
+            const fileName = req.body.newNameOfFile
+            await UserModel.update({ avatar: fileName }, { where: { id: parseInt(uid) } })
+            res.json({ message: "Image uploaded successfully", result: null, success: true }).end()
         } catch (error: any) {
             if (error instanceof Error) {
                 res.json({ message: error.message, result: null, success: false })

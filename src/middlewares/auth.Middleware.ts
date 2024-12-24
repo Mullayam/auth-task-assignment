@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import type { Response, Request, NextFunction } from 'express'
 import { __CONFIG__ } from "@/app/config";
 import { RouteResolver } from "@/app/common/RouteResolver";
-import { PUBLIC_ROUTE_KEY } from "@/utils/helpers/constants";
+import { PUBLIC_ROUTE_KEY, USER_ROLE } from "@/utils/helpers/constants";
 import { IUser } from "@/utils/interfaces/user.interface";
 import { cacheServiceInstance } from "@/utils/services/redis/cacheService";
 import { match } from 'path-to-regexp';
@@ -24,8 +24,8 @@ export class JwtAuth {
                 const result = matcher(path);
                 return !!result;
             })?.handler;
-
             const isPublicRoute = routeHandler && Reflect.getMetadata(PUBLIC_ROUTE_KEY, routeHandler);
+
 
             if (isPublicRoute) {
                 return next();
@@ -52,10 +52,10 @@ export class JwtAuth {
                 res.json({ message: "Invalid Token", result: null, success: false }).end()
                 return
             }
-            // if (decodedToken.role !== "User") {
-            //     res.json({ message: "Access Denied", result: null, success: false }).end()
-            //     return
-            // }
+            if (req.path.includes("admin") && req.path.startsWith("/admin") && decodedToken.role !== USER_ROLE.ADMIN) {
+                res.json({ message: "Access Denied", result: null, success: false }).end()
+                return
+            }
             // req.session["user"] = decodedToken
             req.user = decodedToken
             // fetch client secerert from db or redis connection, for eg we use uid as secret

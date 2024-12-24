@@ -11,8 +11,21 @@ class BaseController {
             const search = queries.q
 
 
+            if (search === "all") {
+                let result = await UserModel.findAndCountAll({
+                    attributes: { include: ["id", "name", "email", "avatar"] },
+                })
+                res.json({
+                    message: "Data Fetched successfully", result: {
+                        data: result.rows,
+                        total: result.count,
+
+                    }, success: true
+                }).end()
+                return
+            }
             let result = await UserModel.findAndCountAll({
-                attributes: { exclude: ["password"], include: ["id", "name", "avatar"] },
+                attributes: { include: ["id", "name", "email", "avatar"] },
                 where: {
                     [Op.or]: [
                         { name: { [Op.like]: `%${search}%` } }, // Search in name
@@ -39,6 +52,7 @@ class BaseController {
 
 
     }
+    @PublicRoute()
     public async getAllUsers(req: Request, res: Response) {
         try {
             const queries = req.query as { page: string, limit: string }
@@ -46,7 +60,7 @@ class BaseController {
             const limit = parseInt(queries.limit) || 10
             const offset = (page - 1) * limit
             const CACHE_KEY = `users-${page}-${limit}`
-             
+
             // const cachedData = await cacheServiceInstance.cache.get(CACHE_KEY)
             // if (cachedData) {
             //     res.json({ message: "Data fetched from cache", result: JSON.parse(cachedData), success: true })
@@ -78,6 +92,7 @@ class BaseController {
 
     }
 
+    @PublicRoute()
     public async getUser(req: Request, res: Response) {
         try {
             const params = req.params as { user_id: string, }
@@ -90,10 +105,10 @@ class BaseController {
                 return
             }
             let result = await UserModel.findOne({
-                attributes: { exclude: ["password"] },
+                attributes: { exclude: ["password","email_verification_token","email_verification_token_expires","password_reset_token","password_reset_token_expiry"] },
                 where: { id: user_id }
             })
-            cacheServiceInstance.cache.set(CACHE_KEY, JSON.stringify(result), { EX: 600 })
+            cacheServiceInstance.cache.set(CACHE_KEY, JSON.stringify(result), { EX: 10 })
             res.json({ message: "Data Fetched successfully", result, success: true })
         } catch (error: any) {
             if (error instanceof Error) {
@@ -103,14 +118,18 @@ class BaseController {
             res.json({ message: "Something went wrong", result: null, success: false })
         }
     }
-     
+
     public async updateUser(req: Request, res: Response) {
         try {
             const params = req.params as { user_id: string, }
-            const user_id = parseInt(params.user_id)          
+            const user_id = parseInt(params.user_id)
             const CACHE_KEY = `users-${user_id}`
             cacheServiceInstance.cache.del(CACHE_KEY)
-            const result = await UserModel.update(req.body, { where: { id: user_id } })
+            let body = req.body
+            if ("role" in body) {
+                body.role = body.role.toUpperCase()
+            }
+            const result = await UserModel.update(body, { where: { id: user_id } })
             res.json({ message: "User Updated successfully", result, success: true })
         } catch (error: any) {
             if (error instanceof Error) {
@@ -120,6 +139,7 @@ class BaseController {
             res.json({ message: "Something went wrong", result: null, success: false })
         }
     }
+
     public async deleteUser(req: Request, res: Response) {
         try {
             const params = req.params as { user_id: string, }
@@ -129,6 +149,10 @@ class BaseController {
             })
             const CACHE_KEY = `users-${user_id}`
             cacheServiceInstance.cache.del(CACHE_KEY)
+            if (result === 0) {
+                throw new Error("User not found")
+
+            }
             res.json({ message: "User Deleted successfully", result, success: true })
         } catch (error: any) {
             if (error instanceof Error) {

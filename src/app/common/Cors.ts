@@ -18,9 +18,9 @@ export class Cors {
         return {
             origin: "*",
             optionsSuccessStatus: 200,
-            methods: ["GET", "POST", "PUT", "DELETE"],
+            methods: ["GET", "POST", "PUT", "DELETE","PATCH"],
             allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept", "Authorization", "Sessionid"],
-            credentials: true
+            credentials: true,
         }
     }
 }

@@ -13,24 +13,29 @@ export class GoogleAuthProvider extends AbstractOAuth2Provider {
             access_type: "offline",
             scope: scopes,
         });
+
         return googleURL;
     }
 
     async handleCallback<T>(code: string): Promise<T> {
-        // Example logic for handling OAuth2 callback
-        const response = await fetch("https://oauth2.googleapis.com/token", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                client_id: this.clientId,
-                client_secret: this.clientSecret,
-                code,
-                redirect_uri: this.redirectUri,
-                grant_type: "authorization_code",
-            }),
-        });
 
-        const data = await response.json();
-        return data as T; // Cast the response to a generic type
+        try {
+            const response = await fetch("https://oauth2.googleapis.com/token", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    client_id: this.clientId,
+                    client_secret: this.clientSecret,
+                    code,
+                    redirect_uri: this.redirectUri,
+                    grant_type: "authorization_code",
+                }),
+            });
+
+            const data = await response.json();
+            return data as T;
+        } catch (error) {
+            return error as T;
+        }
     }
 }

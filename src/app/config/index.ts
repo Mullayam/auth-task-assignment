@@ -36,7 +36,7 @@ const __config = {
         SMTP_HOST_PORT: Number(process.env.SMTP_HOST_PORT) || 465,
         SMTP_HOST_USER: String(process.env.SMTP_HOST_USER),
         SMTP_HOST_PASS: String(process.env.SMTP_HOST_PASS),
-        SMTP_SENDER_NAME: Number(process.env.SMTP_SENDER_NAME),
+        SMTP_SENDER_NAME: String(process.env.SMTP_SENDER_NAME),
     },
     CACHE: {
         CACHE_ENBALED: String(process.env.CACHE_ENBALED),

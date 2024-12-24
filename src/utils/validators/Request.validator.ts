@@ -63,17 +63,15 @@ export const UserReqValidator = {
             .withMessage('Confirm Password must be at least 6 characters long')
             .notEmpty()
             .withMessage('Confirm Password field is required'),
-        param('token').notEmpty().withMessage('Reset Password Token is required'),
+        query('token').notEmpty().withMessage('Reset Password Token is required'),
 
     ],
     VerifyEmail: [
-        body('email')
-            .isString()
-            .isEmail()
-            .withMessage('Please provide a valid email address')
-            .notEmpty()
-            .withMessage('Email field is required'),
-        param('token').notEmpty().withMessage('Verify Email Token is required'),
+        query('token').notEmpty().withMessage('Verify Email Token is required'),
+        query('type')
+            .notEmpty()             
+            .isIn(['verify', 'reset'])
+            .withMessage('Type must be either "verify" or "reset"')
 
     ],
 };

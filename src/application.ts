@@ -15,10 +15,11 @@ import { SessionHandler } from '@/app/common/Session';
 import { Interceptor } from '@/app/common/Interceptors'
 import { RouteResolver } from '@/app/common/RouteResolver';
 import { AppMiddlewares } from '@/middlewares/app.middleware';
-import { CreateConnection,CloseConnection } from '@factory/db'
+import { CreateConnection, CloseConnection } from '@factory/db'
 import { AppLifecycleManager } from '@app/modules/appLifecycle';
 import { AppEvents } from './utils/services/Events';
 import { Modifiers } from './app/common/Modifiers';
+import { join } from 'path';
 
 
 class AppServer {
@@ -47,14 +48,28 @@ class AppServer {
     private ApplyConfiguration(): void {
         Logging.dev("Applying Express Server Configurations")
         Modifiers.useRoot(AppServer.App)
-        AppServer.App.use(helmet());
-        AppServer.App.use(morgan("dev"));       
+        AppServer.App.use(helmet({
+            crossOriginResourcePolicy: false,
+          }));
+        AppServer.App.use(morgan("dev"));
         AppServer.App.use(Cors.useCors());
         AppServer.App.use(bodyParser.json());
         AppServer.App.use(useHttpsRedirection);
         AppServer.App.use(SessionHandler.forRoot());
         AppServer.App.use(cookieParser(__CONFIG__.SECRETS.COOKIE_SECRET));
         AppServer.App.use(bodyParser.urlencoded({ extended: false }));
+        const options = {
+            dotfiles: 'ignore',
+            etag: false,
+            extensions: ['htm', 'html'],
+            index: false,
+            maxAge: '1d',
+            redirect: false,
+            setHeaders(res: any, path: any, stat: any) {
+                res.set('x-timestamp', Date.now())
+            }
+        }
+        AppServer.App.use('/public', express.static(join(process.cwd(), 'uploads'), options));
     }
     /**
      * Initializes the middlewares for the application.
@@ -145,13 +160,13 @@ class AppServer {
     InitailizeApplication(): Application {
         Logging.dev("Application Dependencies Injected")
         try {
-         
+
             CreateConnection()
-            .then(() => this.InitServer())
-            .catch(error => {
-                Logging.dev(error )
-                process.exit(1)
-            })          
+                .then(() => this.InitServer())
+                .catch(error => {
+                    Logging.dev(error)
+                    process.exit(1)
+                })
             return AppServer.App
 
         } catch (error: any) {

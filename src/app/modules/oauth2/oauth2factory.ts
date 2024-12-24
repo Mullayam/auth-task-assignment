@@ -1,21 +1,50 @@
-import { AuthProvidersList, IAuthProvider } from "@/utils/interfaces/user.interface"; 
+import { AuthProvidersList, IAuthProvider } from "@/utils/interfaces/user.interface";
 import { GoogleAuthProvider } from "./provider/GoogleAuthProvider ";
- 
+
 export class AuthProviderFactory {
+  static createProvider(
+    providerName: AuthProvidersList,
+    credentials: { clientId: string; clientSecret: string; redirectUri: string }
+  ): IAuthProvider;
+
   static createProvider(
     providerName: AuthProvidersList,
     clientId: string,
     clientSecret: string,
     redirectUri: string
+  ): IAuthProvider;
+
+  static createProvider(
+    providerName: AuthProvidersList,
+    clientIdOrCredentials: string | { clientId: string; clientSecret: string; redirectUri: string },
+    clientSecret?: string,
+    redirectUri?: string
   ): IAuthProvider {
-    this.validateInputs(clientId, clientSecret, redirectUri);
-    switch (providerName.toLowerCase()) {
-      case "google":
-        return new GoogleAuthProvider(clientId, clientSecret, redirectUri);
-       
-      default:
-        throw new Error(`Provider ${providerName} not supported.`);
+    // If credentials object is passed
+    if (typeof clientIdOrCredentials === "object") {
+      const { clientId, clientSecret, redirectUri } = clientIdOrCredentials;
+      this.validateInputs(clientId, clientSecret, redirectUri);
+      switch (providerName.toLowerCase()) {
+        case "google":
+          return new GoogleAuthProvider(clientId, clientSecret, redirectUri);
+        default:
+          throw new Error(`Provider ${providerName} not supported.`);
+      }
+
     }
+
+    // If individual string arguments are passed
+    if (typeof clientIdOrCredentials === "string" && clientSecret && redirectUri) {
+      this.validateInputs(clientIdOrCredentials, clientSecret, redirectUri);
+      switch (providerName.toLowerCase()) {
+        case "google":
+          return new GoogleAuthProvider(clientIdOrCredentials, clientSecret, redirectUri);
+        default:
+          throw new Error(`Provider ${providerName} not supported.`);
+      }
+    }
+
+    throw new Error("Invalid arguments passed to createProvider.");
   }
   private static validateInputs(clientId: string, clientSecret: string, redirectUri: string): void {
     if (!clientId || clientId.trim() === "") {
