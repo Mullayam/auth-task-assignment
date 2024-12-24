@@ -8,6 +8,7 @@ import authService from "../user/auth.service";
 import utils from "@/utils";
 import { ID_TOKEN } from '../../../utils/interfaces/index';
 import { __CONFIG__ } from "@/app/config";
+import { USER_STATUS } from '../../../utils/interfaces/user.interface';
 
 const provider: Record<AuthProvidersList, IAuthProvider | undefined> = {
     "google": AuthProviderFactory.createProvider("google", {
@@ -48,6 +49,7 @@ class OAuthProvider {
             }
             const { code } = req.query;
             const result = await provider[providerName].handleCallback<GoogleAuthProviderResponse>(code as string);
+            console.log(result)
             if ("error" in result) {
                 throw new Error("Error in Logging in")
             }
@@ -61,14 +63,15 @@ class OAuthProvider {
                     password: hashedPassword,
                     name: jwt.name,
                     avatar: jwt.picture,
-                    email_verification_token: null
+                    email_verification_token: null,
+                    status:USER_STATUS.ACTIVE
                 })
             }
             const userObj: IUser = { uid: user.id.toString(), email: user.email, name: user.name, avatar: user.avatar, role: user.role };
             const access_token = utils.signJWT(userObj, `${user.id}`);
             res.json({
                 message: "Login Success, Redirecting...", result: {
-                    user, access_token,
+                    user:userObj, access_token,
                     type: "Bearer",
                     expires_at: __CONFIG__.SECRETS.JWT_SECRET_EXPIRATION
                 }, success: true

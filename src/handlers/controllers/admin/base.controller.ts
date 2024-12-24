@@ -5,6 +5,7 @@ import type { Request, Response } from "express";
 import { Op } from "sequelize";
 
 class BaseController {
+    @PublicRoute()
     public async searchUsers(req: Request, res: Response) {
         try {
             const queries = req.query as { q: string, }
@@ -52,7 +53,7 @@ class BaseController {
 
 
     }
-    @PublicRoute()
+
     public async getAllUsers(req: Request, res: Response) {
         try {
             const queries = req.query as { page: string, limit: string }
@@ -61,11 +62,11 @@ class BaseController {
             const offset = (page - 1) * limit
             const CACHE_KEY = `users-${page}-${limit}`
 
-            // const cachedData = await cacheServiceInstance.cache.get(CACHE_KEY)
-            // if (cachedData) {
-            //     res.json({ message: "Data fetched from cache", result: JSON.parse(cachedData), success: true })
-            //     return
-            // }
+            const cachedData = await cacheServiceInstance.cache.get(CACHE_KEY)
+            if (cachedData) {
+                res.json({ message: "Data fetched from cache", result: JSON.parse(cachedData), success: true })
+                return
+            }
 
             let result = await UserModel.findAndCountAll({
                 attributes: { exclude: ["password"] },
@@ -105,7 +106,7 @@ class BaseController {
                 return
             }
             let result = await UserModel.findOne({
-                attributes: { exclude: ["password","email_verification_token","email_verification_token_expires","password_reset_token","password_reset_token_expiry"] },
+                attributes: { exclude: ["password", "email_verification_token", "email_verification_token_expires", "password_reset_token", "password_reset_token_expiry"] },
                 where: { id: user_id }
             })
             cacheServiceInstance.cache.set(CACHE_KEY, JSON.stringify(result), { EX: 10 })
