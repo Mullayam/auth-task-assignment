@@ -5,7 +5,8 @@
   "scripts": {
     "build": "nest build",
     "ready": "npm install",
-    "start": "node ./build/main.js",
+    "start:dev": "node ./build/main.js",
+    "start": "nest start",
     "dev": "nest start --watch",
     "mig:create": "typeorm migration:create ./src/factory/migrations/%npm_config_name%",
     "mig:run": "npx typeorm-ts-node-esm migration:generate ./src/factory/migrations/%npm_config_name% -d ./src/app/config/Datasource.ts",
