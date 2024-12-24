@@ -9,7 +9,7 @@ export default function SearchFilter({ searchTerm, setSearchTerm }: { searchTerm
                     placeholder="Search by name or email"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent rounded-none"
+                    className="w-full px-4 py-2     border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent rounded-none"
                 />
             </div>
 

@@ -7,16 +7,17 @@ import { apiHandlers } from '@/lib/api/handler';
 import PopConfirm from '@/components/common/popConfirm';
 import moment from 'moment'
 import Badge from '@/components/common/badges';
-import { MyAutoComplete } from '@/components/common/autoComplete';
 import SearchFilter from '@/components/common/searchFilter';
 import MyResponsiveTable from '@/components/common/responsiveTable';
 import { AllUserDataType } from '@/types';
+import { __config } from '@/lib/config';
+import MyImage from '@/components/common/myImage';
 
 type ColumnsType<T extends object = object> = TableProps<T>['columns'];
 type TablePaginationConfig = Exclude<GetProp<TableProps, 'pagination'>, boolean>;
 
 
-interface TableParams {
+export interface TableParams {
     pagination?: TablePaginationConfig;
     sortField?: SorterResult<any>['field'];
     sortOrder?: SorterResult<any>['order'];
@@ -31,11 +32,8 @@ const columns: ColumnsType<AllUserDataType> = [
         width: '20%',
         render: (_, record) => (
             <div className="flex items-center gap-4">
-                <img
-                    className="w-10 h-10 rounded-full"
-                    src=" https://images.unsplash.com/photo-1499714608240-22fc6ad53fb2?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=76&q=80"
-                    alt=""
-                />
+                <MyImage avatar={record?.avatar || null} name={record?.name} />
+
                 <span className="font-mediumtext-black">
                     {record.name}
                 </span>
@@ -163,6 +161,7 @@ export const AllUsers: React.FC = () => {
     ]);
     useEffect(() => {
         handleFilterData(searchTerm)
+        document.title = `All Users`
     }, [searchTerm])
 
     const handleTableChange: TableProps<AllUserDataType>['onChange'] = (pagination, filters, sorter) => {
@@ -187,9 +186,13 @@ export const AllUsers: React.FC = () => {
             <hr className='my-4' />
             <MyResponsiveTable
                 items={filteredUsers || []}
+                tableParams={tableParams}
                 totalRecords={totalRecords}
+                loading={loading}
+                setTableParams={setTableParams}
             />
-            <Table<AllUserDataType>
+
+            {/* <Table<AllUserDataType>
                 className='rounded-none'
                 columns={columns}
                 rowKey={(record) => record.id}
@@ -197,7 +200,7 @@ export const AllUsers: React.FC = () => {
                 pagination={tableParams.pagination}
                 loading={loading}
                 onChange={handleTableChange}
-            />
+            /> */}
 
         </>
     );

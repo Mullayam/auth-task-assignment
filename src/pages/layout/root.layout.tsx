@@ -27,20 +27,24 @@ const RootLayout = () => {
   }, [user, fetchUser])
   if (!user) {
     return <Navigate to="/login" state={{ from: history.pathname }} />
+
   }
+
+
   return (
     <div className="flex flex-col relative">
       <BackgroundLayer />
       <Header open={open} setOpen={setOpen} />
-      {/* main container */}
+      <nav className="order-first">
+        <LeftSidbar open={open} user={user} />
+      </nav>
       <div className="flex-1 flex flex-row overflow-y-hidden pt-16">
         <main className={`flex-1 ${open ? "lg:ml-64 xl:ml-70 md:ml-64 " : "lg:ml-16 xl:ml-16 md:ml-16"} p-4 relative w-full duration-75 h-full transition-width bg-transparent overflow-y-auto`}>
-          <Outlet />
+          {["ADMIN", "USER"].includes(user.role) ? <Outlet /> : <>
+            Your role is not allowed to access this page
+          </>}
         </main>
-        {/* Left Sidebar */}
-        <nav className="order-first">
-          <LeftSidbar open={open} />
-        </nav>
+
 
       </div>
     </div>

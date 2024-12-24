@@ -1,19 +1,19 @@
 import React from 'react'
 import SiteLogo from './logo'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { UserDropdown } from './userDropdown'
 import { SettingOutlined } from '@ant-design/icons';
-import { notification, type MenuProps } from 'antd';
-import { useAppDispatch, useAppSelector } from '@/hooks/useAppStore';
+import { type MenuProps } from 'antd'; import { useAppDispatch, useAppSelector } from '@/hooks/useAppStore';
 import { apiHandlers } from '@/lib/api/handler';
 import { useOpenNotification } from '@/hooks/useToast';
 import { logoutUser } from '@/store/slices/auth.actions';
 import toast from 'react-hot-toast';
+import { __config } from '@/lib/config';
+import MyImage from '@/components/common/myImage';
 const Header = ({ open, setOpen }: { open: boolean, setOpen: React.Dispatch<React.SetStateAction<boolean>> }) => {
     const { user } = useAppSelector(x => x.auth);
     const dispatch = useAppDispatch()
 
-    const notify = useOpenNotification()
     const navigate = useNavigate()
     const items: MenuProps['items'] = [
 
@@ -69,7 +69,7 @@ const Header = ({ open, setOpen }: { open: boolean, setOpen: React.Dispatch<Reac
                             <div className="ml-16 hidden md:block">
                                 <div className="flex items-center px-4">
 
-                                    
+
                                 </div>
                             </div>
                             <span className=" dark:text-white text-slate-800 ">
@@ -80,19 +80,12 @@ const Header = ({ open, setOpen }: { open: boolean, setOpen: React.Dispatch<Reac
                             <div className="ml-4 flex items-center md:ml-6">
                                 <small className='hidden md:block mx-2'>{user?.name}</small>
                                 <UserDropdown items={items} handleMenuClick={handleMenuClick}>
-
                                     <button
                                         className="max-w-xs bg-white flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
 
                                     >
-
-                                        <img
-                                            className="h-8 w-8 rounded-full"
-                                            src={user?.avatar || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"}
-                                            alt=""
-                                        />
+                                        <MyImage avatar={user?.avatar||null} name={user?.name} />
                                     </button>
-
                                 </UserDropdown>
 
                             </div>
