@@ -49,7 +49,6 @@ class OAuthProvider {
             }
             const { code } = req.query;
             const result = await provider[providerName].handleCallback<GoogleAuthProviderResponse>(code as string);
-            console.log(result)
             if ("error" in result) {
                 throw new Error("Error in Logging in")
             }
